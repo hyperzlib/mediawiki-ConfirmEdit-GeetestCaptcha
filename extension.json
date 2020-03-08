@@ -1,0 +1,56 @@
+{
+	"name": "GeetestCaptcha",
+	"author": [
+		"..."
+	],
+	"url": "https://www.mediawiki.org/wiki/Extension:ConfirmEdit#ReCaptcha_(NoCaptcha)",
+	"descriptionmsg": "geetestcaptcha-desc",
+	"license-name": "MIT",
+	"type": "antispam",
+	"MessagesDirs": {
+		"GeetestCaptcha": [
+			"i18n"
+		]
+	},
+	"APIModules": {
+		"getgeetestcode": "ApiGeetestCaptchaCode"
+	},
+	"AutoloadClasses": {
+		"ApiGeetestCaptchaCode": "includes/ApiGeetestCaptchaCode.php",
+		"GeetestCaptcha": "includes/GeetestCaptcha.php",
+		"GeetestLib": "includes/GeetestLib.php",
+		"GeetestCaptchaHooks": "includes/GeetestCaptchaHooks.php",
+		"HTMLGeetestCaptchaField": "includes/HTMLGeetestCaptchaField.php",
+		"GeetestCaptchaAuthenticationRequest": "includes/GeetestCaptchaAuthenticationRequest.php"
+	},
+	"config": {
+		"CaptchaClass": "GeetestCaptcha",
+		"GeetestID": "",
+		"GeetestKey": ""
+	},
+	"ResourceFileModulePaths": {
+		"localBasePath": "resources",
+		"remoteExtPath": "ConfirmEdit/GeetestCaptcha/resources"
+	},
+	"ResourceModules": {
+		"ext.confirmEdit.GeetestCaptcha.visualEditor": {
+			"scripts": ["gt.js", "ve-confirmedit-GeetestCaptcha/ve.init.mw.GeetestCaptchaSaveErrorHandler.js"],
+			"targets": [ "desktop", "mobile" ],
+			"messages": [
+				"geetest-edit"
+			]
+		},
+		"ext.confirmEdit.GeetestCaptcha": {
+			"scripts": ["gt.js", "geetest.js"],
+			"styles": ["geetest.less"],
+			"targets": [ "desktop", "mobile" ]
+		}
+	},
+	"Hooks": {
+		"ResourceLoaderGetConfigVars": "GeetestCaptchaHooks::onResourceLoaderGetConfigVars"
+	},
+	"VisualEditorPluginModules": [
+		"ext.confirmEdit.GeetestCaptcha.visualEditor"
+	],
+	"manifest_version": 1
+}
