@@ -1,0 +1,15 @@
+{
+	"@metadata": {
+		"authors": [
+			"A2093064",
+			"Kly"
+		]
+	},
+	"geetest-desc": "用於確認編輯的驗證",
+	"geetest-edit": "為保護 wiki 防止自動化垃圾內容編輯程式，我們希望您通過下方驗證：",
+	"geetest-addurl": "您的編輯使用了新的外部連結。為了防止自動化垃圾內容編輯程式，我們要麻煩您輸入在下面方塊中顯示的單字。",
+	"geetest-badlogin": "為保護wiki免遭自動化的密碼破解，我們希望您通過下方驗證：",
+	"geetest-createaccount": "為保護 wiki 防止自動化帳號建立程式，我們希望您通過下方驗證：",
+	"geetest-createaccount-fail": "看來您的驗證碼似乎不正確。",
+	"geetest-create": "為保護 wiki 防止自動化頁面建立程式，我們希望您通過下方驗證："
+}

@@ -1,0 +1,17 @@
+{
+	"@metadata": {
+		"authors": [
+			"Hyperzlib"
+		]
+	},
+	"geetest-edit": "为防止机器编辑，请完成下方验证",
+	"geetest-addurl": "您的编辑包含新的外部链接。为防止机器编辑，请完成下方验证",
+	"geetest-badlogin": "为了保护您的账号安全，请完成下方验证",
+	"geetest-createaccount": "为防止机器人注册，请完成下方验证",
+	"geetest-createaccount-fail": "验证码不正确。",
+	"geetest-create": "为防止机器人创建页面，请完成下方验证",
+	"geetest-apihelp-param-g-recaptcha-response": "来自ReCaptcha小部件的字段。",
+	"apihelp-geetestcaptchareload-example-1": "获取极验验证码所需的数据",
+	"apihelp-getgeetestcode-summary": "获取极验验证码所需的数据",
+	"geetestcaptcha-desc": "使用极验验证码"
+}

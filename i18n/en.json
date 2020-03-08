@@ -1,0 +1,14 @@
+{
+	"@metadata": {
+		"authors": []
+	},
+	"geetest-desc": "reCAPTCHA NoCAPTCHA module for Confirm Edit",
+	"geetest-edit": "To protect the wiki against automated edit spam, we kindly ask you to solve the following CAPTCHA:",
+	"geetest-addurl": "Your edit includes new external links. To protect the wiki against automated spam, we kindly ask you to solve the following CAPTCHA:",
+	"geetest-badlogin": "To protect the wiki against automated password cracking, we kindly ask you to solve the following CAPTCHA:",
+	"geetest-createaccount": "To protect the wiki against automated account creation, we kindly ask you to solve the following CAPTCHA:",
+	"geetest-createaccount-fail": "It seems you haven't solved the CAPTCHA.",
+	"apihelp-geetestcaptchareload-example-1": "Get geetest code.",
+	"apihelp-getgeetestcode-summary": "Get geetest code.",
+	"geetestcaptcha-desc": "Use Geetest Captcha"
+}
