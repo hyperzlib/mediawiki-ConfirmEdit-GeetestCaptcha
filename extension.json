@@ -3,9 +3,10 @@
 	"author": [
 		"..."
 	],
-	"url": "https://www.mediawiki.org/wiki/Extension:ConfirmEdit#ReCaptcha_(NoCaptcha)",
+	"version": "0.1.1",
+	"url": "https://www.mediawiki.org/wiki/Extension:ConfirmEdit",
 	"descriptionmsg": "geetestcaptcha-desc",
-	"license-name": "MIT",
+	"license-name": "GPL-2.0-or-later",
 	"type": "antispam",
 	"MessagesDirs": {
 		"GeetestCaptcha": [
@@ -35,10 +36,7 @@
 	"ResourceModules": {
 		"ext.confirmEdit.GeetestCaptcha.visualEditor": {
 			"scripts": ["gt.js", "ve-confirmedit-GeetestCaptcha/ve.init.mw.GeetestCaptchaSaveErrorHandler.js"],
-			"targets": [ "desktop", "mobile" ],
-			"messages": [
-				"geetest-edit"
-			]
+			"targets": [ "desktop", "mobile" ]
 		},
 		"ext.confirmEdit.GeetestCaptcha": {
 			"scripts": ["gt.js", "geetest.js"],

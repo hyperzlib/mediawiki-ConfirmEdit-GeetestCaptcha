@@ -1,4 +1,4 @@
-# ConfirmEdit的极验验证码扩展
+# 极验验证码扩展
 ## 用法
 首先启动ConfirmEdit扩展，具体请参考：[ConfirmEdit](https://www.mediawiki.org/wiki/Extension:ConfirmEdit)
 

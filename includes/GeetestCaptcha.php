@@ -121,6 +121,17 @@ class GeetestCaptcha extends SimpleCaptcha {
 		}
 	}
 
+	public function passCaptchaLimited($index, $word, User $user){
+		global $wgRequest;
+		$request = [
+			'id' => $wgRequest->getVal( 'geetest_id' ),
+			'challenge' => $wgRequest->getVal( 'geetest_challenge' ),
+			'validate' => $wgRequest->getVal( 'geetest_validate' ),
+			'seccode' => $wgRequest->getVal( 'geetest_seccode' ),
+		];
+		return $this->passCaptcha($request, '');
+	}
+
 	/**
 	 * @param array &$resultArr
 	 */

@@ -58,7 +58,7 @@ mw.libs.ve.targetLoader.addPlugin( function () {
 			this.getReadyPromise().then( function (geetestData) {
 				target.saveDialog.showMessage( 'api-save-error', $container );
 
-				$container.parent('p').find('strong').text(mw.message('geetest-edit').parse());
+				$container.parent('p').find('strong').text(mw.message('captcha-label').parse());
 
 				self.captchaId = geetestData.id;
 
