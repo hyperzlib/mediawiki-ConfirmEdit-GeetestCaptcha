@@ -42,6 +42,10 @@
 			"scripts": ["gt.js", "geetest.js"],
 			"styles": ["geetest.less"],
 			"targets": [ "desktop", "mobile" ]
+		},
+		"ext.confirmEdit.GeetestCaptcha.init": {
+			"scripts": ["init.js"],
+			"targets": [ "desktop", "mobile" ]
 		}
 	},
 	"Hooks": {

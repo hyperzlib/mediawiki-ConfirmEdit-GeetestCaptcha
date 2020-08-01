@@ -27,6 +27,7 @@ class HTMLGeetestCaptchaField extends HTMLFormField {
 		$out = $this->mParent->getOutput();
 		
 		$out->addModules('ext.confirmEdit.GeetestCaptcha');
+		$out->addModules('ext.confirmEdit.GeetestCaptcha.init');
 
 		$output = Html::openElement( 'div', [
 			'class' => [

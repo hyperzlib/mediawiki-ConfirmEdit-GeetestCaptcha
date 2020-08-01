@@ -39,8 +39,11 @@ class GeetestCaptcha extends SimpleCaptcha {
 	public function getFormInformation( $tabIndex = 1 ) {
 		$output = Html::openElement( 'script', [
 			'type' => 'text/javascript',
-		]) . 'mw.loader.using("ext.confirmEdit.GeetestCaptcha", function(){ isekai.initConfirmEditGeetest(); });'
-		 . Html::closeElement( 'script' ) . Html::openElement( 'div', [
+		]) . 'if(typeof mw !== "undefined") {
+			mw.loader.using("ext.confirmEdit.GeetestCaptcha", function(){
+				isekai.initConfirmEditGeetest();
+			});
+		}' . Html::closeElement( 'script' ) . Html::openElement( 'div', [
 			'class' => [
 				'geetest-captcha',
 				'mw-confirmedit-captcha-fail' => (bool)$this->error,
@@ -52,6 +55,10 @@ class GeetestCaptcha extends SimpleCaptcha {
 		] ) . Html::closeElement( 'div' );
 		return [
 			'html' => $output,
+			'modules' => [
+				'ext.confirmEdit.GeetestCaptcha',
+				'ext.confirmEdit.GeetestCaptcha.init',
+			],
 		];
 	}
 

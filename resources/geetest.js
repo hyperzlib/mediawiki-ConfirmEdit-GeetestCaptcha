@@ -41,8 +41,4 @@ if(!window.isekai){
             }
         });
     }
-
-    $(function(){
-        isekai.initConfirmEditGeetest();
-    });
 })();
