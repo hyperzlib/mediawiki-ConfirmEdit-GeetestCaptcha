@@ -33,8 +33,10 @@ class HTMLGeetestCaptchaField extends HTMLFormField {
 				'geetest-captcha',
 				'mw-confirmedit-captcha-fail' => (bool)$this->error,
 			],
-		] ) . Html::hidden( 'geetest_id', false, [
+		] ) . Html::hidden( 'wpCaptchaId', false, [
 			'class' => 'geetest-captcha-id',
+		] ) . Html::hidden( 'wpCaptchaWord', false, [
+			'class' => 'geetest-captcha-data',
 		] ) . Html::closeElement( 'div' );
 		return $output;
 	}

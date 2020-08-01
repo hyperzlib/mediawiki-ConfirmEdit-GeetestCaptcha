@@ -37,17 +37,21 @@ class GeetestCaptcha extends SimpleCaptcha {
 	 * @return array
 	 */
 	public function getFormInformation( $tabIndex = 1 ) {
-		$output = Html::openElement( 'div', [
+		$output = Html::openElement( 'script', [
+			'type' => 'text/javascript',
+		]) . 'mw.loader.using("ext.confirmEdit.GeetestCaptcha", function(){ isekai.initConfirmEditGeetest(); });'
+		 . Html::closeElement( 'script' ) . Html::openElement( 'div', [
 			'class' => [
 				'geetest-captcha',
 				'mw-confirmedit-captcha-fail' => (bool)$this->error,
 			],
-		] ) . Html::hidden( 'geetest_id', false, [
+		] ) . Html::hidden( 'wpCaptchaId', false, [
 			'class' => 'geetest-captcha-id',
+		] ) . Html::hidden( 'wpCaptchaWord', false, [
+			'class' => 'geetest-captcha-data',
 		] ) . Html::closeElement( 'div' );
 		return [
 			'html' => $output,
-			'modules' => ['ext.confirmEdit.GeetestCaptcha'],
 		];
 	}
 
@@ -72,16 +76,8 @@ class GeetestCaptcha extends SimpleCaptcha {
 	 * @return array
 	 */
 	protected function getCaptchaParamsFromRequest( WebRequest $request ) {
-		// ReCaptchaNoCaptcha combines captcha ID + solution into a single value
-		// API is hardwired to return captchaWord, so use that if the standard isempty
-		// "captchaWord" is sent as "captchaword" by visual editor
-		$index = [
-			'id' => $request->getVal( 'geetest_id' ),
-			'challenge' => $request->getVal( 'geetest_challenge' ),
-			'validate' => $request->getVal( 'geetest_validate' ),
-			'seccode' => $request->getVal( 'geetest_seccode' ),
-		];
-		$response = 'not used';
+		$index = $request->getVal('wpCaptchaId');
+		$response = json_decode($request->getVal('wpCaptchaWord'), true);
 		return [ $index, $response ];
 	}
 
@@ -95,7 +91,7 @@ class GeetestCaptcha extends SimpleCaptcha {
 	 * @param string $word captcha solution
 	 * @return bool
 	 */
-	protected function passCaptcha( $request, $word ) {
+	protected function passCaptcha( $index, $request ) {
 		global $wgRequest, $wgUser, $wgGeetestID, $wgGeetestKey;
 		// Build data to append to request
 		if(!empty($wgUser)){
@@ -104,8 +100,8 @@ class GeetestCaptcha extends SimpleCaptcha {
 			$uid = 'guest';
 		}
 
-		$session = $this->retrieveCaptcha($request['id']);
-		$this->clearCaptcha($request['id']);
+		$session = $this->retrieveCaptcha($index);
+		$this->clearCaptcha($index);
 
 		$GtSdk = new GeetestLib($wgGeetestID, $wgGeetestKey);
 		$data = [
@@ -115,21 +111,14 @@ class GeetestCaptcha extends SimpleCaptcha {
 		];
 
 		if ($session['gtserver'] == 1) { //在线验证
-			return $GtSdk->success_validate($request['challenge'], $request['validate'], $request['seccode'], $data);
+			return $GtSdk->success_validate($request['geetest_challenge'], $request['geetest_validate'], $request['geetest_seccode'], $data);
 		} else { //离线验证
-			return $GtSdk->fail_validate($request['challenge'], $request['validate'], $request['seccode']);
+			return $GtSdk->fail_validate($request['geetest_challenge'], $request['geetest_validate'], $request['geetest_seccode']);
 		}
 	}
 
 	public function passCaptchaLimited($index, $word, User $user){
-		global $wgRequest;
-		$request = [
-			'id' => $wgRequest->getVal( 'geetest_id' ),
-			'challenge' => $wgRequest->getVal( 'geetest_challenge' ),
-			'validate' => $wgRequest->getVal( 'geetest_validate' ),
-			'seccode' => $wgRequest->getVal( 'geetest_seccode' ),
-		];
-		return $this->passCaptcha($request, '');
+		return $this->passCaptcha($index, $word);
 	}
 
 	/**

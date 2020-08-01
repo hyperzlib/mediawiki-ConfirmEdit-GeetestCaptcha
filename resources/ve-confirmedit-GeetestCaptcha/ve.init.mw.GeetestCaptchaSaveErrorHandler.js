@@ -31,24 +31,14 @@ mw.libs.ve.targetLoader.addPlugin( function () {
 		self.captchaValidate = {};
 
 		// Register extra fields
-		target.saveFields.geetest_id = function () {
+		target.saveFields.wpCaptchaId = function () {
 			// eslint-disable-next-line no-jquery/no-global-selector
 			return self.captchaId;
 		};
 
-		target.saveFields.geetest_challenge = function () {
+		target.saveFields.wpCaptchaWord = function () {
 			// eslint-disable-next-line no-jquery/no-global-selector
-			return self.captchaValidate.geetest_challenge;
-		};
-
-		target.saveFields.geetest_validate = function () {
-			// eslint-disable-next-line no-jquery/no-global-selector
-			return self.captchaValidate.geetest_validate;
-		};
-
-		target.saveFields.geetest_seccode = function () {
-			// eslint-disable-next-line no-jquery/no-global-selector
-			return self.captchaValidate.geetest_seccode;
+			return JSON.stringify(self.captchaValidate);
 		};
 
 		if ( self.captchaObj ) {
