@@ -12,8 +12,7 @@ class GeetestCaptchaAuthenticationRequest extends CaptchaAuthenticationRequest {
 	}
 
 	public function loadFromSubmission( array $data ) {
-		// unhack the hack in parent
-		return AuthenticationRequest::loadFromSubmission( $data );
+		return true;
 	}
 
 	public function getFieldInfo() {

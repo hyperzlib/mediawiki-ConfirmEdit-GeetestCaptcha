@@ -5,10 +5,60 @@
     .geetest-captcha-id {
         display: none;
     }
+
+    .loading {
+        width: 290px;
+        height: 44px;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
+        background-color: #f4f4f4
+    }
+
+    .loading > div {
+        width: 10px;
+        height: 10px;
+        background-color: #347eff;
+        border-radius: 50%;
+        display: inline-block;
+        -webkit-animation: bounceDelay 1s infinite ease-in-out;
+        animation: bounceDelay 1s infinite ease-in-out;
+        -webkit-animation-fill-mode: both;
+        animation-fill-mode: both;
+        margin-left: 4px
+    }
+
+    .loading > .bounce1 {
+        -webkit-animation-delay: -.32s;
+        animation-delay: -.32s
+    }
+
+    .loading > .bounce2 {
+        -webkit-animation-delay: -.16s;
+        animation-delay: -.16s
+    }
 }
 
 .mw-editform {
     .geetest-captcha {
         max-width: 350px;
+    }
+}
+
+@-webkit-keyframes bounceDelay {
+    0%,80%,to {
+        -webkit-transform: scale(0);
+        transform: scale(0)
+    }
+
+    40% {
+        -webkit-transform: scale(1);
+        transform: scale(1)
     }
 }

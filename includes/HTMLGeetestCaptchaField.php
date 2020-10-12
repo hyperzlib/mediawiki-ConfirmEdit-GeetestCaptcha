@@ -25,16 +25,24 @@ class HTMLGeetestCaptchaField extends HTMLFormField {
 
 	public function getInputHTML( $value ) {
 		$out = $this->mParent->getOutput();
-		
+
+		$out->addModuleStyles('ext.confirmEdit.GeetestCaptcha.styles');
 		$out->addModules('ext.confirmEdit.GeetestCaptcha');
+		$out->addModules('ext.confirmEdit.GeetestCaptcha.init');
 
 		$output = Html::openElement( 'div', [
 			'class' => [
 				'geetest-captcha',
 				'mw-confirmedit-captcha-fail' => (bool)$this->error,
 			],
-		] ) . Html::hidden( 'geetest_id', false, [
+		] ) . '<div class="loading">
+			<div class="bounce1"></div>
+			<div class="bounce2"></div>
+			<div class="bounce3"></div>
+		</div>' . Html::hidden( 'wpCaptchaId', false, [
 			'class' => 'geetest-captcha-id',
+		] ) . Html::hidden( 'wpCaptchaWord', false, [
+			'class' => 'geetest-captcha-data',
 		] ) . Html::closeElement( 'div' );
 		return $output;
 	}

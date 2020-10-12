@@ -37,17 +37,33 @@ class GeetestCaptcha extends SimpleCaptcha {
 	 * @return array
 	 */
 	public function getFormInformation( $tabIndex = 1 ) {
-		$output = Html::openElement( 'div', [
+		$output = Html::openElement( 'script', [
+			'type' => 'text/javascript',
+		]) . 'if(typeof mw !== "undefined") {
+			mw.loader.using(["ext.confirmEdit.GeetestCaptcha.styles", "ext.confirmEdit.GeetestCaptcha"], function(){
+				isekai.initConfirmEditGeetest();
+			});
+		}' . Html::closeElement( 'script' ) . Html::openElement( 'div', [
 			'class' => [
 				'geetest-captcha',
 				'mw-confirmedit-captcha-fail' => (bool)$this->error,
 			],
-		] ) . Html::hidden( 'geetest_id', false, [
+		] ) . '<div class="loading">
+			<div class="bounce1"></div>
+			<div class="bounce2"></div>
+			<div class="bounce3"></div>
+		</div>' . Html::hidden( 'wpCaptchaId', false, [
 			'class' => 'geetest-captcha-id',
+		] ) . Html::hidden( 'wpCaptchaWord', false, [
+			'class' => 'geetest-captcha-data',
 		] ) . Html::closeElement( 'div' );
 		return [
 			'html' => $output,
-			'modules' => ['ext.confirmEdit.GeetestCaptcha'],
+			'modules' => [
+				'ext.confirmEdit.GeetestCaptcha.styles',
+				'ext.confirmEdit.GeetestCaptcha',
+				'ext.confirmEdit.GeetestCaptcha.init',
+			],
 		];
 	}
 
@@ -56,7 +72,7 @@ class GeetestCaptcha extends SimpleCaptcha {
 	 */
 	protected function logCheckError( $info ) {
 		if ( $info instanceof Status ) {
-			$errors = $info->getErrorsArray();
+			$errors = $info->getErrors();
 			$error = $errors[0][0];
 		} elseif ( is_array( $info ) ) {
 			$error = implode( ',', $info );
@@ -72,16 +88,9 @@ class GeetestCaptcha extends SimpleCaptcha {
 	 * @return array
 	 */
 	protected function getCaptchaParamsFromRequest( WebRequest $request ) {
-		// ReCaptchaNoCaptcha combines captcha ID + solution into a single value
-		// API is hardwired to return captchaWord, so use that if the standard isempty
-		// "captchaWord" is sent as "captchaword" by visual editor
-		$index = [
-			'id' => $request->getVal( 'geetest_id' ),
-			'challenge' => $request->getVal( 'geetest_challenge' ),
-			'validate' => $request->getVal( 'geetest_validate' ),
-			'seccode' => $request->getVal( 'geetest_seccode' ),
-		];
-		$response = 'not used';
+		$index = $request->getVal('wpCaptchaId');
+		$response = json_decode($request->getVal('wpCaptchaWord'), true);
+		
 		return [ $index, $response ];
 	}
 
@@ -95,7 +104,7 @@ class GeetestCaptcha extends SimpleCaptcha {
 	 * @param string $word captcha solution
 	 * @return bool
 	 */
-	protected function passCaptcha( $request, $word ) {
+	protected function passCaptcha( $index, $request ) {
 		global $wgRequest, $wgUser, $wgGeetestID, $wgGeetestKey;
 		// Build data to append to request
 		if(!empty($wgUser)){
@@ -104,8 +113,12 @@ class GeetestCaptcha extends SimpleCaptcha {
 			$uid = 'guest';
 		}
 
-		$session = $this->retrieveCaptcha($request['id']);
-		$this->clearCaptcha($request['id']);
+		if(!$request){
+			list($index, $request) = $this->getCaptchaParamsFromRequest($wgRequest);
+		}
+
+		$session = $this->retrieveCaptcha($index);
+		$this->clearCaptcha($index);
 
 		$GtSdk = new GeetestLib($wgGeetestID, $wgGeetestKey);
 		$data = [
@@ -115,10 +128,14 @@ class GeetestCaptcha extends SimpleCaptcha {
 		];
 
 		if ($session['gtserver'] == 1) { //在线验证
-			return $GtSdk->success_validate($request['challenge'], $request['validate'], $request['seccode'], $data);
+			return $GtSdk->success_validate($request['geetest_challenge'], $request['geetest_validate'], $request['geetest_seccode'], $data);
 		} else { //离线验证
-			return $GtSdk->fail_validate($request['challenge'], $request['validate'], $request['seccode']);
+			return $GtSdk->fail_validate($request['geetest_challenge'], $request['geetest_validate'], $request['geetest_seccode']);
 		}
+	}
+
+	public function passCaptchaLimited($index, $word, User $user){
+		return $this->passCaptcha($index, $word);
 	}
 
 	/**
@@ -162,7 +179,7 @@ class GeetestCaptcha extends SimpleCaptcha {
 	 * @param int $flags
 	 * @return bool
 	 */
-	public function apiGetAllowedParams( &$module, &$params, $flags ) {
+	public function apiGetAllowedParams( ApiBase $module, &$params, $flags ) {
 		if ( $flags && $this->isAPICaptchaModule( $module ) ) {
 			$params['g-recaptcha-response'] = [
 				ApiBase::PARAM_HELP_MSG => 'renocaptcha-apihelp-param-g-recaptcha-response',
