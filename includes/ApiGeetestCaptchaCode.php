@@ -1,6 +1,6 @@
 <?php
 /**
- * Api module to reload FancyCaptcha
+ * Api module to load GeetestCaptcha
  *
  * @ingroup API
  * @ingroup Extensions

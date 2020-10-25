@@ -5,6 +5,8 @@ use MediaWiki\Auth\AuthenticationRequest;
 class GeetestCaptcha extends SimpleCaptcha {
 	protected static $messagePrefix = 'geetest-';
 
+	private static $passedId = [];
+
 	private $error = null;
 
 	public function getCode() {
@@ -106,6 +108,10 @@ class GeetestCaptcha extends SimpleCaptcha {
 	 */
 	protected function passCaptcha( $index, $request ) {
 		global $wgRequest, $wgUser, $wgGeetestID, $wgGeetestKey;
+		// 缓存的结果
+		if(in_array($index, self::$passedId)){
+			return true;
+		}
 		// Build data to append to request
 		if(!empty($wgUser)){
 			$uid = strval($wgUser->getID());
@@ -128,14 +134,21 @@ class GeetestCaptcha extends SimpleCaptcha {
 		];
 
 		if ($session['gtserver'] == 1) { //在线验证
-			return $GtSdk->success_validate($request['geetest_challenge'], $request['geetest_validate'], $request['geetest_seccode'], $data);
+			$status = $GtSdk->success_validate($request['geetest_challenge'], $request['geetest_validate'], $request['geetest_seccode'], $data);
 		} else { //离线验证
-			return $GtSdk->fail_validate($request['geetest_challenge'], $request['geetest_validate'], $request['geetest_seccode']);
+			$status = $GtSdk->fail_validate($request['geetest_challenge'], $request['geetest_validate'], $request['geetest_seccode']);
+		}
+
+		if($status){
+			self::$passedId[] = $index;
+			return true;
+		} else {
+			return false;
 		}
 	}
 
-	public function passCaptchaLimited($index, $word, User $user){
-		return $this->passCaptcha($index, $word);
+	public function passCaptchaLimited($index, $request, User $user){
+		return $this->passCaptcha($index, $request);
 	}
 
 	/**
