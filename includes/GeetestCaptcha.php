@@ -165,7 +165,7 @@ class GeetestCaptcha extends SimpleCaptcha {
 	public function describeCaptchaType() {
 		global $wgReCaptchaSiteKey;
 		return [
-			'type' => 'recaptchanocaptcha',
+			'type' => 'geetestcaptcha',
 			'mime' => 'image/png',
 			'key' => $wgReCaptchaSiteKey,
 		];
