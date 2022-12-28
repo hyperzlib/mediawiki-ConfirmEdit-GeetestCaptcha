@@ -26,7 +26,7 @@ mw.libs.ve.targetLoader.addPlugin(function() {
 
     ve.init.mw.GeetestCaptchaSaveErrorHandler.static.process = function(data, target) {
         var self = this,
-            $container = $('<div>');
+            $container = $('<div></div>');
 
         self.captchaValidate = {};
 

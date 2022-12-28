@@ -8,12 +8,13 @@ class HTMLGeetestCaptchaField extends HTMLFormField {
 	/** @var string Error returned by ReCaptcha in the previous round. */
 	protected $error;
 
-	/**
-	 * Parameters:
-	 * - key: (string, required) ReCaptcha public key
-	 * - error: (string) ReCaptcha error from previous round
-	 * @param array $params
-	 */
+    /**
+     * Parameters:
+     * - key: (string, required) ReCaptcha public key
+     * - error: (string) ReCaptcha error from previous round
+     * @param array $params
+     * @throws \MWException
+     */
 	public function __construct( array $params ) {
 		$params += [ 'error' => null ];
 		parent::__construct( $params );

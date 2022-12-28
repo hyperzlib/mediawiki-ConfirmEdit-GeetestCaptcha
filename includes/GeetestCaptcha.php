@@ -1,6 +1,8 @@
 <?php
 
 use MediaWiki\Auth\AuthenticationRequest;
+use MediaWiki\Extension\ConfirmEdit\Auth\CaptchaAuthenticationRequest;
+use MediaWiki\Extension\ConfirmEdit\SimpleCaptcha\SimpleCaptcha;
 
 class GeetestCaptcha extends SimpleCaptcha {
 	protected static $messagePrefix = 'geetest-';
@@ -10,7 +12,12 @@ class GeetestCaptcha extends SimpleCaptcha {
 	private $error = null;
 
 	public function getCode() {
-		global $wgGeetestID, $wgGeetestKey, $wgRequest, $wgUser;
+		global $wgGeetestID, $wgGeetestKey;
+		
+		$requestCtx = RequestContext::getMain()->getUser();
+		$wgUser = $requestCtx->getUser();
+		$wgRequest = $requestCtx->getRequest();
+
 		if(!empty($wgUser)){
 			$uid = strval($wgUser->getID());
 		} else {
@@ -33,28 +40,33 @@ class GeetestCaptcha extends SimpleCaptcha {
 		return $code;
 	}
 
+	private function buildGeetestWidget($scene = 'normal'){
+	    $jsParam = "'" . $scene . "'";
+	    return Html::openElement( 'script', [
+                'type' => 'text/javascript',
+            ]) . 'if(typeof mw !== "undefined") {
+			mw.loader.using(["ext.confirmEdit.GeetestCaptcha.styles", "ext.confirmEdit.GeetestCaptcha"], function(){
+				isekai.initConfirmEditGeetest(' . $jsParam . ');
+			});
+		}' . Html::closeElement( 'script' ) . Html::openElement( 'div', [
+                'class' => [
+                    'geetest-captcha',
+                    'mw-confirmedit-captcha-fail' => (bool)$this->error,
+                ],
+            ] ) . '<div class="loading">
+			<div class="bounce1"></div>
+			<div class="bounce2"></div>
+			<div class="bounce3"></div>
+		</div>';
+    }
+
 	/**
 	 * Get the captcha form.
 	 * @param int $tabIndex
 	 * @return array
 	 */
 	public function getFormInformation( $tabIndex = 1 ) {
-		$output = Html::openElement( 'script', [
-			'type' => 'text/javascript',
-		]) . 'if(typeof mw !== "undefined") {
-			mw.loader.using(["ext.confirmEdit.GeetestCaptcha.styles", "ext.confirmEdit.GeetestCaptcha"], function(){
-				isekai.initConfirmEditGeetest();
-			});
-		}' . Html::closeElement( 'script' ) . Html::openElement( 'div', [
-			'class' => [
-				'geetest-captcha',
-				'mw-confirmedit-captcha-fail' => (bool)$this->error,
-			],
-		] ) . '<div class="loading">
-			<div class="bounce1"></div>
-			<div class="bounce2"></div>
-			<div class="bounce3"></div>
-		</div>' . Html::hidden( 'wpCaptchaId', false, [
+		$output = $this->buildGeetestWidget() . Html::hidden( 'wpCaptchaId', false, [
 			'class' => 'geetest-captcha-id',
 		] ) . Html::hidden( 'wpCaptchaWord', false, [
 			'class' => 'geetest-captcha-data',
@@ -90,24 +102,33 @@ class GeetestCaptcha extends SimpleCaptcha {
 	 * @return array
 	 */
 	protected function getCaptchaParamsFromRequest( WebRequest $request ) {
-		$index = $request->getVal('wpCaptchaId');
-		$response = json_decode($request->getVal('wpCaptchaWord'), true);
+		$index = $request->getVal('wpCaptchaId', $request->getVal('captchaid'));
+		$response = json_decode($request->getVal('wpCaptchaWord',
+            $request->getVal('captchaword')), true);
 		
 		return [ $index, $response ];
 	}
 
-	/**
-	 * Check, if the user solved the captcha.
-	 *
-	 * Based on reference implementation:
-	 * https://github.com/google/recaptcha#php
-	 *
-	 * @param mixed $request datas
-	 * @param string $word captcha solution
-	 * @return bool
-	 */
+    /**
+     * Check, if the user solved the captcha.
+     *
+     * @param $index
+     * @param mixed $request datas
+     * @return bool
+     * @throws \MWException
+     */
 	protected function passCaptcha( $index, $request ) {
-		global $wgRequest, $wgUser, $wgGeetestID, $wgGeetestKey;
+		global $wgGeetestID, $wgGeetestKey;
+
+		$requestCtx = RequestContext::getMain()->getUser();
+		$wgUser = $requestCtx->getUser();
+		$wgRequest = $requestCtx->getRequest();
+
+        if(!$request || !is_array($request)){
+            list($index, $request) = $this->getCaptchaParamsFromRequest($wgRequest);
+        }
+        if(isset($request['geetest_id'])) $index = $request['geetest_id'];
+        if(!isset($request['geetest_challenge'])) return false;
 		// 缓存的结果
 		if(in_array($index, self::$passedId)){
 			return true;
@@ -117,10 +138,6 @@ class GeetestCaptcha extends SimpleCaptcha {
 			$uid = strval($wgUser->getID());
 		} else {
 			$uid = 'guest';
-		}
-
-		if(!$request){
-			list($index, $request) = $this->getCaptchaParamsFromRequest($wgRequest);
 		}
 
 		$session = $this->retrieveCaptcha($index);
@@ -157,6 +174,8 @@ class GeetestCaptcha extends SimpleCaptcha {
 	protected function addCaptchaAPI( &$resultArr ) {
 		$resultArr['captcha'] = $this->describeCaptchaType();
 		$resultArr['captcha']['error'] = $this->error;
+        $resultArr['captcha']['id'] = md5(uniqid());
+        $resultArr['captcha']['question'] = $this->buildGeetestWidget('mobileFrontend');
 	}
 
 	/**
@@ -166,7 +185,7 @@ class GeetestCaptcha extends SimpleCaptcha {
 		global $wgReCaptchaSiteKey;
 		return [
 			'type' => 'geetestcaptcha',
-			'mime' => 'image/png',
+			'mime' => 'text/html',
 			'key' => $wgReCaptchaSiteKey,
 		];
 	}
@@ -193,10 +212,13 @@ class GeetestCaptcha extends SimpleCaptcha {
 	 * @return bool
 	 */
 	public function apiGetAllowedParams( ApiBase $module, &$params, $flags ) {
-		if ( $flags && $this->isAPICaptchaModule( $module ) ) {
-			$params['g-recaptcha-response'] = [
-				ApiBase::PARAM_HELP_MSG => 'renocaptcha-apihelp-param-g-recaptcha-response',
-			];
+		if ( $this->isAPICaptchaModule( $module ) ) {
+            $params['captchaword'] = [
+                ApiBase::PARAM_HELP_MSG => 'captcha-apihelp-param-captchaword',
+            ];
+            $params['captchaid'] = [
+                ApiBase::PARAM_HELP_MSG => 'captcha-apihelp-param-captchaid',
+            ];
 		}
 
 		return true;
@@ -207,7 +229,7 @@ class GeetestCaptcha extends SimpleCaptcha {
 	}
 
 	public function getCaptcha() {
-		return [];
+	    return [];
 	}
 
 	/**

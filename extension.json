@@ -34,7 +34,7 @@
 	},
 	"ResourceFileModulePaths": {
 		"localBasePath": "resources",
-		"remoteExtPath": "ConfirmEdit/GeetestCaptcha/resources"
+		"remoteExtPath": "GeetestCaptcha/resources"
 	},
 	"ResourceModules": {
 		"ext.confirmEdit.GeetestCaptcha.visualEditor": {

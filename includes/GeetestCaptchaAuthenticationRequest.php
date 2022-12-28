@@ -1,6 +1,6 @@
 <?php
 
-use MediaWiki\Auth\AuthenticationRequest;
+use MediaWiki\Extension\ConfirmEdit\Auth\CaptchaAuthenticationRequest;
 
 /**
  * Authentication request for ReCaptcha v2. Unlike the parent class, no session storage is used
@@ -8,7 +8,7 @@ use MediaWiki\Auth\AuthenticationRequest;
  */
 class GeetestCaptchaAuthenticationRequest extends CaptchaAuthenticationRequest {
 	public function __construct() {
-		parent::__construct( null, null );
+		parent::__construct( null, [] );
 	}
 
 	public function loadFromSubmission( array $data ) {
